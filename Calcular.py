@@ -1,56 +1,41 @@
 import PySimpleGUI as sg
 
-# Definindo as distâncias pré-definidas em Km
-distancias = [5, 10, 15, 21.097, 41.195]
+# Distâncias pré-definidas em metros
+distances = {"5 km": 5000, "10 km": 10000, "15 km": 15000, "Meia-maratona": 21095, "Maratona": 42195}
 
-# Definindo o layout da tela para perguntar a distância
-layout_distancia = [[sg.Text('Escolha uma das distâncias pré-definidas ou insira uma distância qualquer (em Km):')],
-                    [sg.Combo(values=distancias, size=(10,1), key='-DISTANCIA_COMBO-'),
-                     sg.InputText(size=(10,1), key='-DISTANCIA_INPUT-')],
-                    [sg.Button('Ok'), sg.Button('Cancelar')]]
+# Layout da interface gráfica
+layout = [
+    [sg.Text("Distância"), sg.Combo(list(distances.keys()), key="-DISTANCE-"), sg.Text("Ritmo (min/km)"), sg.InputText(key="-PACE-")],
+    [sg.Radio("Calcular Tempo Total e Velocidade Média", "radio_calculation", default=True, key="-TIME_SPEED-"), sg.Radio("Calcular Ritmo e Velocidade Média", "radio_calculation", key="-PACE_SPEED-")],
+    [sg.Button("Calcular")],
+    [sg.Text("Resultado"), sg.Text("", key="-OUTPUT-")]
+]
 
-# Definindo o layout da tela para perguntar o ritmo
-layout_ritmo = [[sg.Text('Qual o ritmo desejado (em minutos por Km)?')],
-                [sg.InputText(size=(10,1), key='-RITMO-')],
-                [sg.Button('Ok'), sg.Button('Cancelar')]]
+# Criação da janela
+window = sg.Window("Calculadora de Corrida", layout)
 
-# Definindo o layout da tela para mostrar o resultado
-layout_resultado = [[sg.Text('Tempo Total:'), sg.Text('', size=(10,1), key='-TEMPO_TOTAL-')],
-                    [sg.Text('Velocidade Média (Km/h):'), sg.Text('', size=(10,1), key='-VELOCIDADE_MEDIA-')]]
-
-# Definindo o layout da tela para perguntar o pace
-layout_pace = [[sg.Text('Qual o pace desejado (em minutos por Km)?')],
-               [sg.InputText(size=(10,1), key='-PACE-')],
-               [sg.Button('Ok'), sg.Button('Cancelar')]]
-
-# Definindo o layout da tela principal
-layout_principal = [[sg.Button('Calcular Tempo total e Velocidade Média'), sg.Button('Calcular Pace e Velocidade Média')],
-                    [sg.Button('Sair')]]
-
-# Criando as janelas
-janela_distancia = sg.Window('Distância', layout_distancia)
-janela_ritmo = sg.Window('Ritmo', layout_ritmo)
-janela_pace = sg.Window('Pace', layout_pace)
-janela_resultado = sg.Window('Resultado', layout_resultado)
-janela_principal = sg.Window('Calculadora de Corrida', layout_principal)
-
-# Loop principal do programa
 while True:
-    evento_principal, valores_principal = janela_principal.read()
-    if evento_principal == sg.WINDOW_CLOSED or evento_principal == 'Sair':
+    event, values = window.read()
+    if event == sg.WINDOW_CLOSED:
         break
-    elif evento_principal == 'Calcular Tempo total e Velocidade Média':
-        evento_distancia, valores_distancia = janela_distancia.read()
-        if evento_distancia == sg.WINDOW_CLOSED or evento_distancia == 'Cancelar':
-            continue
-        elif valores_distancia['-DISTANCIA_COMBO-'] != '':
-            distancia = float(valores_distancia['-DISTANCIA_COMBO-'])
-        elif valores_distancia['-DISTANCIA_INPUT-'] != '':
-            distancia = float(valores_distancia['-DISTANCIA_INPUT-'])
-        evento_ritmo, valores_ritmo = janela_ritmo.read()
-        if evento_ritmo == sg.WINDOW_CLOSED or evento_ritmo == 'Cancelar':
-            continue
-        ritmo = float(valores_ritmo['-RITMO-'])
-        tempo_total_min = ritmo * distancia
-        tempo_total_horas = tempo_total_min / 60
-        velocidade_media = distancia / tempo_total_horas
+    
+    # Obtem a distância e o ritmo do usuário
+    distance = distances[values["-DISTANCE-"]]
+    pace = float(values["-PACE-"])
+    
+    # Verifica qual opção de cálculo foi selecionada
+    if values["-TIME_SPEED-"]:
+        # Calcula o tempo total e a velocidade média
+        time = pace * distance / 60
+        speed = distance / 1000 / (time / 60)
+        
+        # Exibe o resultado
+        window["-OUTPUT-"].update(f"Tempo Total: {time:.2f} minutos\nVelocidade Média: {speed:.2f} km/h")
+        
+    elif values["-PACE_SPEED-"]:
+        # Calcula o ritmo e a velocidade média
+        pace_time = pace / distance * 60
+        speed = distance / 1000 / (pace_time / 60)
+        
+        # Exibe o resultado
+        window["-OUTPUT-"].update(f"Ritmo: {pace_time:.2f} minutos/km\nVelocidade Média: {speed:.2f} km/h")
