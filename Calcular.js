@@ -62,3 +62,5 @@
       const paceOkBtn = document.getElementById("pace-ok-btn");
       const paceCancelarBtn = document.getElementById("pace-cancelar-btn");
       const resultadoModal = document.getElementById("
+
+      
