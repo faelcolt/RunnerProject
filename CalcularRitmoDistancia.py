@@ -52,4 +52,5 @@ while True:
             continue
         ritmo = float(valores_ritmo['-RITMO-'])
         tempo_total_min = ritmo * distancia
-        tempo_total_horas =
+        tempo_total_horas = tempo_total_min / 60
+        velocidade_media = distancia / tempo_total_horas
