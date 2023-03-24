@@ -1,56 +1,55 @@
 import PySimpleGUI as sg
 
-# Define as distâncias pré-definidas
-distances = {"5 km": 5, "10 km": 10, "15 km": 15, "Meia maratona (21.097 km)": 21.097, "Maratona (42.195 km)": 42.195}
+# Definindo as distâncias pré-definidas em Km
+distancias = [5, 10, 15, 21.097, 41.195]
 
-# Define a interface gráfica da tela 1
-layout1 = [
-    [sg.Text("Escolha a distância:")],
-    [sg.Radio(text, "DISTANCE", default=(key == "5 km"), key=key) for key, text in distances.items()],
-    [sg.Radio("Outra distância:", "DISTANCE", key="OTHER"), sg.InputText(key="OTHER_DISTANCE", size=(10, 1), disabled=True)],
-    [sg.Text("Ritmo desejado por km (minutos):"), sg.InputText(key="PACE", size=(5, 1))],
-    [sg.Button("Calcular"), sg.Button("Cancelar")]
-]
+# Definindo o layout da tela para perguntar a distância
+layout_distancia = [[sg.Text('Escolha uma das distâncias pré-definidas ou insira uma distância qualquer (em Km):')],
+                    [sg.Combo(values=distancias, size=(10,1), key='-DISTANCIA_COMBO-'),
+                     sg.InputText(size=(10,1), key='-DISTANCIA_INPUT-')],
+                    [sg.Button('Ok'), sg.Button('Cancelar')]]
 
-# Define a interface gráfica da tela 2
-layout2 = [
-    [sg.Text("Tempo total:", size=(20, 1)), sg.Text("", size=(20, 1), key="TOTAL_TIME")],
-    [sg.Text("Velocidade média (km/h):", size=(20, 1)), sg.Text("", size=(20, 1), key="AVG_SPEED")],
-    [sg.Button("Voltar")]
-]
+# Definindo o layout da tela para perguntar o ritmo
+layout_ritmo = [[sg.Text('Qual o ritmo desejado (em minutos por Km)?')],
+                [sg.InputText(size=(10,1), key='-RITMO-')],
+                [sg.Button('Ok'), sg.Button('Cancelar')]]
 
-# Define a interface gráfica da tela 3
-layout3 = [
-    [sg.Text("Pace (min/km):", size=(20, 1)), sg.Text("", size=(20, 1), key="PACE_RESULT")],
-    [sg.Text("Velocidade média (km/h):", size=(20, 1)), sg.Text("", size=(20, 1), key="AVG_SPEED_RESULT")],
-    [sg.Button("Voltar")]
-]
+# Definindo o layout da tela para mostrar o resultado
+layout_resultado = [[sg.Text('Tempo Total:'), sg.Text('', size=(10,1), key='-TEMPO_TOTAL-')],
+                    [sg.Text('Velocidade Média (Km/h):'), sg.Text('', size=(10,1), key='-VELOCIDADE_MEDIA-')]]
 
-# Cria as janelas
-window1 = sg.Window("Calculadora de corrida - Tela 1", layout1)
-window2 = sg.Window("Calculadora de corrida - Tela 2", layout2)
-window3 = sg.Window("Calculadora de corrida - Tela 3", layout3)
+# Definindo o layout da tela para perguntar o pace
+layout_pace = [[sg.Text('Qual o pace desejado (em minutos por Km)?')],
+               [sg.InputText(size=(10,1), key='-PACE-')],
+               [sg.Button('Ok'), sg.Button('Cancelar')]]
 
+# Definindo o layout da tela principal
+layout_principal = [[sg.Button('Calcular Tempo total e Velocidade Média'), sg.Button('Calcular Pace e Velocidade Média')],
+                    [sg.Button('Sair')]]
+
+# Criando as janelas
+janela_distancia = sg.Window('Distância', layout_distancia)
+janela_ritmo = sg.Window('Ritmo', layout_ritmo)
+janela_pace = sg.Window('Pace', layout_pace)
+janela_resultado = sg.Window('Resultado', layout_resultado)
+janela_principal = sg.Window('Calculadora de Corrida', layout_principal)
+
+# Loop principal do programa
 while True:
-    event1, values1 = window1.read()  # Lê os eventos da tela 1
-    
-    if event1 in (sg.WINDOW_CLOSED, "Cancelar"):  # Fecha a aplicação caso o usuário feche a janela ou clique em Cancelar
+    evento_principal, valores_principal = janela_principal.read()
+    if evento_principal == sg.WINDOW_CLOSED or evento_principal == 'Sair':
         break
-    
-    distance = None
-    if values1["OTHER"]:  # Lê a distância informada pelo usuário caso ele tenha selecionado a opção "Outra distância"
-        try:
-            distance = float(values1["OTHER_DISTANCE"])
-        except ValueError:
-            sg.popup("Por favor, informe uma distância válida.", title="Erro")
+    elif evento_principal == 'Calcular Tempo total e Velocidade Média':
+        evento_distancia, valores_distancia = janela_distancia.read()
+        if evento_distancia == sg.WINDOW_CLOSED or evento_distancia == 'Cancelar':
             continue
-    else:  # Lê a distância selecionada pelo usuário caso ele tenha escolhido uma das distâncias pré-definidas
-        for key, value in distances.items():
-            if values1[key]:
-                distance = value
-                break
-    
-    try:
-        pace = float(values1["PACE"])  # Lê o ritmo informado pelo usuário
-    except ValueError:
-        sg.popup("Por favor, informe um ritmo válido.", title
+        elif valores_distancia['-DISTANCIA_COMBO-'] != '':
+            distancia = float(valores_distancia['-DISTANCIA_COMBO-'])
+        elif valores_distancia['-DISTANCIA_INPUT-'] != '':
+            distancia = float(valores_distancia['-DISTANCIA_INPUT-'])
+        evento_ritmo, valores_ritmo = janela_ritmo.read()
+        if evento_ritmo == sg.WINDOW_CLOSED or evento_ritmo == 'Cancelar':
+            continue
+        ritmo = float(valores_ritmo['-RITMO-'])
+        tempo_total_min = ritmo * distancia
+        tempo_total_horas =
