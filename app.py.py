@@ -29,8 +29,12 @@ while True:
         time = pace * distance / 60
         speed = distance / 1000 / (time / 60)
         
+        # Formata o tempo total em horas e minutos
+        hours = int(time // 60)
+        minutes = int(time % 60)
+        
         # Exibe o resultado
-        window["-OUTPUT-"].update(f"Tempo Total: {time:.2f} minutos\nVelocidade Média: {speed:.2f} km/h")
+        window["-OUTPUT-"].update(f"Tempo Total: {hours} horas {minutes} minutos\nVelocidade Média: {speed:.2f} km/h")
         
     elif values["-PACE_SPEED-"]:
         # Calcula o ritmo e a velocidade média
